@@ -15,8 +15,6 @@ vim.opt.breakindent = true
 vim.opt.undofile = true -- Save undo history
 vim.opt.ignorecase = true -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
 vim.opt.smartcase = true
-vim.opt.signcolumn = "no" -- Keep signcolumn on by default
-
 -- Decrease update time
 vim.opt.updatetime = 250
 vim.opt.timeoutlen = 300 -- Displays which-key popup sooner
