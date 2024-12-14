@@ -29,7 +29,7 @@ return {
 
 			-- Useful status updates for LSP.
 			-- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-			{ "j-hui/fidget.nvim",       opts = {} },
+			{ "j-hui/fidget.nvim", opts = {} },
 
 			-- Allows extra capabilities provided by nvim-cmp
 			"hrsh7th/cmp-nvim-lsp",
@@ -126,7 +126,7 @@ return {
 					local client = vim.lsp.get_client_by_id(event.data.client_id)
 					if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
 						local highlight_augroup =
-								vim.api.nvim_create_augroup("kickstart-lsp-highlight", { clear = false })
+							vim.api.nvim_create_augroup("kickstart-lsp-highlight", { clear = false })
 						vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
 							buffer = event.buf,
 							group = highlight_augroup,
@@ -247,6 +247,16 @@ return {
 						completions = {
 							completeFunctionCalls = true,
 						},
+						typescript = {
+							format = {
+								enable = true,
+							},
+						},
+						javascript = {
+							format = {
+								enable = true,
+							},
+						},
 					},
 				},
 				tailwindcss = {},
@@ -257,7 +267,7 @@ return {
 							command = "EslintFixAll",
 						})
 					end,
-				}
+				},
 			}
 
 			-- Ensure the servers and tools above are installed
@@ -292,7 +302,8 @@ return {
 					"emmet_ls",
 					"prismals",
 					"pyright",
-					"tsserver",
+					"ts_ls",
+					"eslint",
 				},
 				automatic_installation = true, -- Automatically install missing servers
 				handlers = {
