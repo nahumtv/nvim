@@ -35,6 +35,8 @@ return {
 				"javascript",
 				"typescript",
 				"tsx",
+				"css",
+				"json",
 			},
 			-- Autoinstall languages that are not installed
 			auto_install = true,

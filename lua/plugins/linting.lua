@@ -12,8 +12,8 @@ return {
 			react = { "eslint" },
 			graphql = { "eslint", "graphql" },
 			html = { "eslint", "htmlhint" },
-			css = { "eslint", "stylelint" },
-			tailwindcss = { "stylelint" },
+			css = { "eslint" },
+			tailwindcss = { "eslint" },
 		}
 
 		local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
