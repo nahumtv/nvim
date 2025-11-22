@@ -1,60 +1,110 @@
+-- Skip Treesitter context_commentstring module auto-loading
+vim.g.skip_ts_context_commentstring_module = true
+
 return {
+	-- NvimTree
 	{
 		"nvim-tree/nvim-tree.lua",
 		version = "*",
 		lazy = false,
-		dependencies = {
-			"nvim-tree/nvim-web-devicons",
+		dependencies = { "nvim-tree/nvim-web-devicons" },
+		opts = {
+			sort_by = "case_sensitive",
+			renderer = {
+				group_empty = true,
+				highlight_git = true,
+			},
+			filters = {
+				dotfiles = false,
+				custom = { "^\\.git$" },
+			},
+			update_focused_file = { enable = true, update_cwd = true },
+			git = { enable = true, ignore = false, timeout = 400 },
 		},
-		config = function()
-			require("nvim-tree").setup({})
-		end,
+		keys = {
+			{ "<leader>e", "<cmd>NvimTreeFindFileToggle<CR>", desc = "Toggle NvimTree" },
+		},
+		config = function(_, opts)
+			local api = require("nvim-tree.api")
 
-		init = function()
-			vim.keymap.set("n", "<leader>e", ":NvimTreeFindFileToggle<cr>")
+			require("nvim-tree").setup(vim.tbl_deep_extend("force", opts, {
+				on_attach = function(bufnr)
+					-- Helper function
+					local function map(lhs, rhs, desc)
+						vim.keymap.set("n", lhs, rhs, { buffer = bufnr, desc = desc })
+					end
+
+					-- Navigation
+					map("h", api.node.navigate.parent_close, "Close folder / go to parent")
+					map("l", api.node.open.edit, "Open file/folder")
+					map("<CR>", api.node.open.edit, "Open file/folder")
+					map("u", api.tree.change_root_to_parent, "Go to parent directory")
+
+					-- FS actions
+					map("r", api.fs.rename, "Rename file")
+					map("a", api.fs.create, "Create file/folder")
+					map("d", api.fs.remove, "Delete file/folder")
+
+					-- 📌 Copy/Cut/Paste
+					map("c", api.fs.copy.node, "Copy file/folder")
+					map("x", api.fs.cut, "Cut file/folder")
+					map("p", api.fs.paste, "Paste file/folder")
+				end,
+			}))
 		end,
 	},
-	{ -- Highlight, edit, and navigate code
+
+	-- Treesitter
+	{
 		"nvim-treesitter/nvim-treesitter",
 		build = ":TSUpdate",
-		main = "nvim-treesitter.configs", -- Sets main module to use for opts
-		-- [[ Configure Treesitter ]] See `:help nvim-treesitter`
+		main = "nvim-treesitter.configs",
+		event = { "BufReadPost", "BufNewFile" },
+
 		opts = {
 			ensure_installed = {
 				"bash",
 				"c",
-				"diff",
 				"html",
 				"lua",
-				"luadoc",
 				"markdown",
 				"markdown_inline",
-				"query",
-				"vim",
-				"vimdoc",
 				"javascript",
 				"typescript",
 				"tsx",
 				"css",
 				"json",
+				"python",
 			},
-			-- Autoinstall languages that are not installed
-			auto_install = true,
+
 			highlight = {
 				enable = true,
-				-- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
-				--  If you are experiencing weird indenting issues, add the language to
-				--  the list of additional_vim_regex_highlighting and disabled languages for indent.
-				additional_vim_regex_highlighting = false,
+				-- 🔥 evita el lag en archivos grandes
+				disable = function(lang, buf)
+					local max_filesize = 500 * 1024 -- 500 KB
+					local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+					if ok and stats and stats.size > max_filesize then
+						return true
+					end
+				end,
 			},
-			indent = { enable = true, disable = { "ruby" } },
-			fold = { enable = true },
+
+			indent = { enable = true },
+
+			-- 🔥 Desactiva textobjects (causa lag)
+			textobjects = { enable = false },
+
+			-- 🔥 Desactiva incremental selection (lento)
+			incremental_selection = { enable = false },
 		},
-		-- There are additional nvim-treesitter modules that you can use to interact
-		-- with nvim-treesitter. You should go explore a few and see what interests you:
-		--
-		--    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`defaul
-		--    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
-		--    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
+	},
+
+	-- ts_context_commentstring (replacement for deprecated module)
+	{
+		"JoosepAlviste/nvim-ts-context-commentstring",
+		lazy = true,
+		config = function()
+			require("ts_context_commentstring").setup({})
+		end,
 	},
 }
