@@ -21,6 +21,11 @@ return {
 			dockerfile = { "hadolint" },
 		}
 		-- ============================================================================
+		-- Create an augroup for linting to manage autocommands
+		-- ============================================================================
+		-- local lint_augroup = vim.api.nvim_create_augroup("Linting", { clear = true })
+
+		-- ============================================================================
 		-- Safe function to run linting without breaking Neovim
 		-- ============================================================================
 		local function safe_lint()
@@ -86,3 +91,4 @@ return {
 		})
 	end,
 }
+

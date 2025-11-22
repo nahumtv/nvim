@@ -52,6 +52,7 @@ return {
 				end,
 			}))
 		end,
+
 	},
 
 	-- Treesitter
@@ -108,3 +109,4 @@ return {
 		end,
 	},
 }
+
