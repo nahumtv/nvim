@@ -1,4 +1,4 @@
-return { -- Autoformat
+return {
 	"stevearc/conform.nvim",
 	event = { "BufWritePre" },
 	cmd = { "ConformInfo" },
@@ -8,35 +8,36 @@ return { -- Autoformat
 			function()
 				require("conform").format({ async = true, lsp_format = "fallback" })
 			end,
-			mode = "",
+			mode = "n",
 			desc = "[F]ormat buffer",
 		},
 	},
 	opts = {
 		notify_on_error = false,
-		format_on_save = function(bufnr)
-			-- Disable "format_on_save lsp_fallback" for languages that don't
-			-- have a well standardized coding style. You can add additional
-			-- languages here or re-enable it for the disabled ones.
-			local disable_filetypes = { c = true, cpp = true }
-			local lsp_format_opt
-			if disable_filetypes[vim.bo[bufnr].filetype] then
-				lsp_format_opt = "never"
-			else
-				lsp_format_opt = "fallback"
-			end
-			return {
-				timeout_ms = 500,
-				lsp_format = lsp_format_opt,
-			}
-		end,
+
+		-- ❌ Disable auto-format on save
+		format_on_save = false,
+
+		-- Format on save function
+		-- format_on_save = function(bufnr)
+		-- 	local ft = vim.bo[bufnr].filetype
+		-- 	local disabled_filetypes = { c = true, cpp = true }
+		-- 	local lsp_format_opt = disabled_filetypes[ft] and "never" or "fallback"
+		--
+		-- 	return {
+		-- 		timeout_ms = 500,
+		-- 		lsp_format = lsp_format_opt,
+		-- 	}
+		-- end,
+
+		-- Filetype-specific formatters
 		formatters_by_ft = {
 			lua = { "stylua" },
-			javascript = { "prettier" },
-			typescript = { "prettier" },
-			javascriptreact = { "prettier" },
-			typescriptreact = { "prettier" },
-			svelte = { "prettier" },
+			javascript = { "eslint_d", "prettier" },
+			typescript = { "eslint_d", "prettier" },
+			javascriptreact = { "eslint_d", "prettier" },
+			typescriptreact = { "eslint_d", "prettier" },
+			svelte = { "eslint_d", "prettier" },
 			css = { "prettier" },
 			html = { "prettier" },
 			json = { "prettier" },
@@ -45,11 +46,23 @@ return { -- Autoformat
 			graphql = { "prettier" },
 			liquid = { "prettier" },
 			python = { "isort", "black" },
-			-- Conform can also run multiple formatters sequentially
-			-- python = { "isort", "black" },
-			--
-			-- You can use 'stop_after_first' to run the first available formatter from the list
-			-- javascript = { "prettierd", "prettier", stop_after_first = true },
 		},
 	},
+
+	formatters = {
+		eslint_d = {
+			command = "eslint_d",
+			args = {
+				"--stdin",
+				"--stdin-filename",
+				"$FILENAME",
+				"--fix",
+			},
+			stdin = true,
+		},
+	},
+	-- Optional: custom config callback after plugin loads
+	config = function(_, opts)
+		require("conform").setup(opts)
+	end,
 }
